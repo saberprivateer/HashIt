@@ -12,8 +12,9 @@ public class App {
     public static ArrayList<Long>[] ht = new ArrayList[400000];
     public static String[] argInput;
     public static double[] argNumbers;
-    public static int[] targets = new int[20001];
+    public static long[] targets = new long[20001];
     public static int numTargets = 0;
+    public static int hashf = 357158;
 //    public static HashMap<Integer, Double> hm = new HashMap<>(20,2);
 
     public static void log(Object args) {
@@ -27,9 +28,9 @@ public class App {
         grabFile("2sum");
         initTarget();
         parse();
-        collision();
+//        collision();
         findTargets();
-        log("Length:" + argInput.length);
+        log("I think the number of targets is "+numTargets);
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
         log("End Program");
@@ -46,17 +47,47 @@ public class App {
     }
 
     public static void findTargets() {
-        boolean notFound = true;
-        int j;
+        long startTime;
+        long endTime;
+        long duration=0;
         for (int i = 0; i < targets.length; i++) {
-            j = 0;
-            while(notFound && (j<ht.length)) {
-                for (int k = 0;k<ht[j].size();j++){
+            startTime = System.nanoTime();
+            if ((i%100)==0) {
+                log("Progress: " + i + "/" + targets.length+" with elapsed time of "+duration/10000000+" seconds since last update.");
+            }
+                numTargets += check2sum(targets[i]);
+            endTime = System.nanoTime();
+            duration = (endTime - startTime);
+        }
+    }
 
+    public static int check2sum(long target) {
+        long x;
+        long y;
+        Long keyTemp;
+        int key;
+        long t;
+        //scan through each bucket in the hashtable
+        for (int i = 0; i < ht.length; i++) {
+            //for each entry in a bucket
+            for (int j = 0; j < ht[i].size(); j++) {
+                //grab the next x
+                x = ht[i].get(j);
+                //find what you'll look for
+                y = target - x;
+                //look it up!
+                keyTemp = Math.abs(y % hashf);
+                //which bucket the match should be in
+                key = keyTemp.intValue();
+                for (int k = 0; k < ht[key].size(); k++) {
+                    t = x + ht[key].get(k);
+                    if (t == target) {
+                        return 1;
+                    }
                 }
-                j++;
             }
         }
+        return 0;
     }
 
     public static void parse() {
@@ -66,7 +97,7 @@ public class App {
         boolean duplicate;
         for (int i = 0; i < n; i++) {
             next = Long.parseLong(argInput[i]);
-            keyTemp = Math.abs(next % 357158);
+            keyTemp = Math.abs(next % hashf);
             key = keyTemp.intValue();
             duplicate = false;
             for (int j = 0; j < ht[key].size(); j++) {
