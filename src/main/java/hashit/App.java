@@ -2,15 +2,20 @@ package hashit;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * Hello world!
  *
  */
-public class App 
-{
+public class App {
     public static int n;
+    public static ArrayList<Long>[] ht = new ArrayList[2000000];
     public static String[] argInput;
+    public static double[] argNumbers;
+    public static int[] targets = new int[20001];
+    public static int numTargets = 0;
+//    public static HashMap<Integer, Double> hm = new HashMap<>(20,2);
 
     public static void log(Object args) {
         System.out.println(args.toString());
@@ -20,13 +25,57 @@ public class App
         long startTime = System.nanoTime();
 
         log("Begin Program");
-        log("End Program");
         grabFile("2sum");
-        log("Lenght:"+argInput.length);
+        initTarget();
+        parse();
+        collision();
+        log("Length:" + argInput.length);
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
-
+        log("End Program");
         log("Program ran for " + duration / 1000000 + " milliseconds");
+    }
+
+    public static void initTarget() {
+        for (int i = 0; i < targets.length; i++) {
+            targets[i] = -10000+i;
+        }
+        for (int i=0;i<ht.length;i++){
+            ht[i] = new ArrayList<>();
+        }
+    }
+
+    public static void parse(){
+        long next;
+        Long keyTemp;
+        int key;
+        for (int i = 0;i<n;i++){
+            next = Long.parseLong(argInput[i]);
+            keyTemp = Math.abs(next % 357158);
+            key = keyTemp.intValue();
+            ht[key].add(next);
+        }
+//        log("where'd it go?");
+//        for (int i = 0;i<100;i++){
+//            for (int j = 0;j<ht[i].size();j++){
+//                System.out.print(Long.toString(ht[i].get(j))+" ");
+//            }
+//            log("");
+//        }
+//        log("");
+        log("Done Parsing");
+    }
+
+    public static void collision(){
+        int colavg = 0;
+        int numcol=0;
+        for (int i = 0; i<ht.length;i++){
+            if (ht[i].size()>0){
+                numcol++;
+                colavg += ht[i].size();
+            }
+        }
+        log("average size in ht:"+(colavg/numcol));
     }
 
     public static void grabFile(String arg) throws IOException, URISyntaxException {
