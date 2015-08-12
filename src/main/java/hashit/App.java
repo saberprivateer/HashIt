@@ -6,11 +6,10 @@ import java.util.*;
 
 /**
  * Hello world!
- *
  */
 public class App {
     public static int n;
-    public static ArrayList<Long>[] ht = new ArrayList[2000000];
+    public static ArrayList<Long>[] ht = new ArrayList[400000];
     public static String[] argInput;
     public static double[] argNumbers;
     public static int[] targets = new int[20001];
@@ -29,6 +28,7 @@ public class App {
         initTarget();
         parse();
         collision();
+        findTargets();
         log("Length:" + argInput.length);
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
@@ -38,22 +38,46 @@ public class App {
 
     public static void initTarget() {
         for (int i = 0; i < targets.length; i++) {
-            targets[i] = -10000+i;
+            targets[i] = -10000 + i;
         }
-        for (int i=0;i<ht.length;i++){
+        for (int i = 0; i < ht.length; i++) {
             ht[i] = new ArrayList<>();
         }
     }
 
-    public static void parse(){
+    public static void findTargets() {
+        boolean notFound = true;
+        int j;
+        for (int i = 0; i < targets.length; i++) {
+            j = 0;
+            while(notFound && (j<ht.length)) {
+                for (int k = 0;k<ht[j].size();j++){
+
+                }
+                j++;
+            }
+        }
+    }
+
+    public static void parse() {
         long next;
         Long keyTemp;
         int key;
-        for (int i = 0;i<n;i++){
+        boolean duplicate;
+        for (int i = 0; i < n; i++) {
             next = Long.parseLong(argInput[i]);
             keyTemp = Math.abs(next % 357158);
             key = keyTemp.intValue();
-            ht[key].add(next);
+            duplicate = false;
+            for (int j = 0; j < ht[key].size(); j++) {
+                if (ht[key].get(j) == next) {
+                    duplicate = true;
+//                    log("DUPLICATE!");
+                }
+            }
+            if (!duplicate) {
+                ht[key].add(next);
+            }
         }
 //        log("where'd it go?");
 //        for (int i = 0;i<100;i++){
@@ -66,16 +90,19 @@ public class App {
         log("Done Parsing");
     }
 
-    public static void collision(){
+    public static void collision() {
         int colavg = 0;
-        int numcol=0;
-        for (int i = 0; i<ht.length;i++){
-            if (ht[i].size()>0){
+        int numcol = 0;
+        int maxsize = 0;
+        for (int i = 0; i < ht.length; i++) {
+            if (ht[i].size() > 0) {
                 numcol++;
                 colavg += ht[i].size();
+                maxsize = i;
             }
         }
-        log("average size in ht:"+(colavg/numcol));
+        log("average size in ht:" + (colavg / numcol));
+        log("the highest accessed index is: " + maxsize);
     }
 
     public static void grabFile(String arg) throws IOException, URISyntaxException {
